@@ -21,12 +21,14 @@
         "url": "https://github.com/SlimIO/Unit-testing/issues"
     },
     "homepage": "https://github.com/SlimIO/Unit-testing#readme",
-    "dependencies": {},
+    "dependencies": {
+        "@slimio/is": "^1.5.0"
+    },
     "devDependencies": {
         "@commitlint/cli": "^7.5.2",
         "@commitlint/config-conventional": "^7.5.0",
         "@escommunity/minami": "^1.0.0",
-        "@slimio/eslint-config": "^2.0.3",
+        "@slimio/eslint-config": "^2.0.4",
         "@types/node": "^11.11.3",
         "ava": "^1.3.1",
         "eslint": "^5.15.2",
