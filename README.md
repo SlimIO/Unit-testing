@@ -3,17 +3,17 @@
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/SlimIO/is/commit-activity)
 ![MIT](https://img.shields.io/github/license/mashape/apistatus.svg)
 
-SlimIO Unit testing framework
+Simple, secure and blazing fast Unit testing framework with no assert lib.
 
 ## Requirements
-- Node.js v10 or higher
+- [Node.js](https://nodejs.org/en/) v10 or higher
 
 ## Goals
-- Avoid fancy and useless features (that will request additional packages).
-- No bundled assertion framework.
+- Avoid fancy and useless features.
+- No bundled assertion framework (chose what you want).
 - The best startup across packages.
 - Synchronous and Asynchronous Unit-testing (with Worker threads API).
-- Module/Unit oriented design.
+- Keep it simple and secure as hell.
 
 ## Getting Started
 
@@ -30,6 +30,10 @@ TBC
 
 ## API
 TBC
+
+## Todo
+- beforeAll / afterAll
+- add plan/success/fail
 
 ## License
 MIT
