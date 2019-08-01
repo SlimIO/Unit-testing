@@ -15,6 +15,9 @@
         "url": "git+https://github.com/SlimIO/Unit-testing.git"
     },
     "keywords": [],
+    "files": [
+        "index.js"
+    ],
     "author": "SlimIO",
     "license": "MIT",
     "bugs": {
