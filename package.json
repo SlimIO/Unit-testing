@@ -7,14 +7,19 @@
         "prepublishOnly": "pkg-ok",
         "test": "ava --verbose",
         "doc": "jsdoc -c ./jsdoc.json -r -R ./README.md -P ./package.json --verbose",
-        "coverage": "nyc ava",
+        "coverage": "nyc npm test",
         "report": "nyc report --reporter=html"
     },
     "repository": {
         "type": "git",
         "url": "git+https://github.com/SlimIO/Unit-testing.git"
     },
-    "keywords": [],
+    "keywords": [
+        "unit",
+        "testing",
+        "lib",
+        "assert"
+    ],
     "files": [
         "index.js"
     ],
