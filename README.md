@@ -35,5 +35,13 @@ TBC
 - beforeAll / afterAll
 - add plan/success/fail
 
+## Dependencies
+
+|Name|Refactoring|Security Risk|Usage|
+|---|---|---|---|
+|[@slimio/is](https://github.com/SlimIO/is)|Minor|Low|Type checker|
+|[@slimio/pretty-stack](https://github.com/SlimIO/pretty-stack#readme)|Minor|High|TBC|
+|[kleur](https://github.com/lukeed/kleur)|Minor|Low|TTY color|
+
 ## License
 MIT
