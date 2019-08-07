@@ -21,8 +21,7 @@
         "assert"
     ],
     "files": [
-        "index.js",
-        "src"
+        "index.js"
     ],
     "author": "SlimIO",
     "license": "MIT",
