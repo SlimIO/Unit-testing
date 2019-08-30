@@ -8,8 +8,46 @@ const is = require("@slimio/is");
 const prettyStack = require("@slimio/pretty-stack");
 const { gray, white, green, red, yellow, bgGreen, bgRed } = require("kleur");
 
+// Require Internal Dependencies
+const Helper = require("./src/helper");
+
 // Vars
 const store = [];
+
+/**
+ * @async
+ * @function executeHandler
+ * @param {!string} title
+ * @param {() => any} handler
+ * @returns {Error | null}
+ */
+async function executeHandler(title, handler) {
+    const handlerStart = performance.now();
+    const help = new Helper();
+
+    try {
+        if (is.asyncFunction(handler)) {
+            await handler(help);
+        }
+        else {
+            handler(help);
+        }
+        if (help.hasExpectedCount === false) {
+            throw new Error(`expected '${help.plan}' assertions but got '${help.count}'`);
+        }
+
+        const executionTimeMs = (performance.now() - handlerStart).toFixed(2);
+        console.log(`${green("✓")} ${gray(title)} ${white().bold(`(${executionTimeMs}ms)`)}`);
+
+        return null;
+    }
+    catch (error) {
+        const executionTimeMs = (performance.now() - handlerStart).toFixed(2);
+        console.log(`${red("✖")} ${red(title)} ${white().bold(`(${executionTimeMs}ms)`)}`);
+
+        return error;
+    }
+}
 
 // Execute at the next loop iteration
 setImmediate(async() => {
@@ -18,23 +56,36 @@ setImmediate(async() => {
     const start = performance.now();
     const errors = [];
 
+    // Execute before is present
+    if (is.func(Unit.before)) {
+        const error = await executeHandler("before", Unit.before);
+        if (error === null) {
+            passed++;
+        }
+        else {
+            console.error(error);
+            process.exit(0);
+        }
+    }
+
     // Execute registered tests
     for (const { title, handler } of store) {
-        const handlerStart = performance.now();
-        try {
-            if (is.asyncFunction(handler)) {
-                await handler();
-            }
-            else {
-                handler();
-            }
-            const executionTimeMs = (performance.now() - handlerStart).toFixed(2);
+        const error = await executeHandler(title, handler);
+        if (error === null) {
             passed++;
-            console.log(`${green("✓")} ${gray(title)} ${white().bold(`(${executionTimeMs}ms)`)}`);
         }
-        catch (error) {
-            const executionTimeMs = (performance.now() - handlerStart).toFixed(2);
-            console.log(`${red("✖")} ${red(title)} ${white().bold(`(${executionTimeMs}ms)`)}`);
+        else {
+            errors.push({ title, error });
+        }
+    }
+
+    // Execute before is present
+    if (is.func(Unit.after)) {
+        const error = await executeHandler("after", Unit.after);
+        if (error === null) {
+            passed++;
+        }
+        else {
             errors.push({ title, error });
         }
     }
@@ -56,7 +107,12 @@ setImmediate(async() => {
         for (const { title, error } of errors) {
             console.log(gray().bold("\n ----------------------------------\n"));
             console.log(` ${red("✖")} ${red(title)}`);
-            prettyStack(error);
+            try {
+                prettyStack(error);
+            }
+            catch (error) {
+                console.log(error);
+            }
         }
     }
 });
