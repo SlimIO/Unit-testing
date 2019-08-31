@@ -31,7 +31,7 @@
     "homepage": "https://github.com/SlimIO/Unit-testing#readme",
     "dependencies": {
         "@slimio/is": "^1.5.0",
-        "@slimio/pretty-stack": "^0.2.0",
+        "@slimio/pretty-stack": "^0.3.0",
         "kleur": "^3.0.3"
     },
     "devDependencies": {
