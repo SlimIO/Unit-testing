@@ -6,7 +6,7 @@
 Simple, secure and blazing fast Unit testing framework with no assert lib.
 
 ## Requirements
-- [Node.js](https://nodejs.org/en/) v10 or higher
+- [Node.js](https://nodejs.org/en/) v12 or higher
 
 ## Goals
 - Avoid fancy and useless features.
