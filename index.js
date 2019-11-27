@@ -32,7 +32,7 @@ async function executeHandler(title, handler) {
         else {
             handler(help);
         }
-        if (help.hasExpectedCount === false) {
+        if (help.hasExpectedPlanCount === false) {
             throw new Error(`expected '${help.plan}' assertions but got '${help.count}'`);
         }
 
