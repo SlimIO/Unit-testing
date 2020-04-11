@@ -1,20 +1,9 @@
-"use strict";
-
-// Symbols
-const kCount = Symbol("kCount");
-const kPlan = Symbol("kPlan");
-
-class Helper {
-    /**
-     * @class Helper
-     */
-    constructor() {
-        Object.defineProperty(this, kPlan, { value: 0, writable: true });
-        Object.defineProperty(this, kCount, { value: 0, writable: true });
-    }
+export default class Helper {
+    #planned = 0;
+    #count = 0;
 
     get hasExpectedPlanCount() {
-        return this[kCount] === this[kPlan];
+        return this.#count === this.#planned;
     }
 
     /**
@@ -28,7 +17,7 @@ class Helper {
             throw new TypeError("count must be a number");
         }
 
-        this[kPlan] = count;
+        this.#planned = count;
     }
 
     /**
@@ -37,8 +26,6 @@ class Helper {
      * @returns {void}
      */
     pass() {
-        this[kCount]++;
+        this.#count++;
     }
 }
-
-module.exports = Helper;

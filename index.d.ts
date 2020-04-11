@@ -9,9 +9,15 @@ declare namespace Unit {
 
     export const after: handler;
     export const before: handler;
+    export const maxThreadCount: number;
+
+    interface Options {
+        async?: boolean;
+        timeout?: number;
+    }
 }
 
-declare function Unit(title: string, handler: Unit.handler): void;
+declare function Unit(title: string, handler: Unit.handler, options?: Unit.Options): void;
 
 export = Unit;
 export as namespace Unit;

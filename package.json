@@ -3,6 +3,7 @@
     "version": "1.0.0",
     "description": "SlimIO Unit testing framework",
     "main": "index.js",
+    "type": "module",
     "scripts": {
         "prepublishOnly": "pkg-ok",
         "test": "cross-env psp && ava --verbose",
@@ -31,22 +32,23 @@
     "homepage": "https://github.com/SlimIO/Unit-testing#readme",
     "dependencies": {
         "@slimio/is": "^1.5.0",
-        "@slimio/pretty-stack": "^0.4.1",
-        "kleur": "^3.0.3"
+        "@slimio/pretty-stack": "^0.4.2",
+        "kleur": "^3.0.3",
+        "ms": "^2.1.2"
     },
     "devDependencies": {
-        "@commitlint/cli": "^8.1.0",
-        "@commitlint/config-conventional": "^8.1.0",
+        "@commitlint/cli": "^8.3.5",
+        "@commitlint/config-conventional": "^8.3.4",
         "@escommunity/minami": "^1.0.0",
-        "@slimio/eslint-config": "^3.0.3",
-        "@slimio/psp": "^0.9.2",
-        "@types/node": "^12.7.3",
-        "ava": "^2.3.0",
-        "cross-env": "^5.2.0",
-        "eslint": "^6.3.0",
-        "husky": "^3.0.4",
-        "jsdoc": "^3.5.5",
-        "nyc": "^14.0.0",
+        "@slimio/eslint-config": "^4.0.0",
+        "@slimio/psp": "^0.11.0",
+        "@types/node": "^13.11.1",
+        "ava": "^3.6.0",
+        "cross-env": "^7.0.2",
+        "eslint": "^6.8.0",
+        "husky": "^4.2.5",
+        "jsdoc": "^3.6.4",
+        "nyc": "^15.0.1",
         "pkg-ok": "^2.3.1"
     },
     "engines": {

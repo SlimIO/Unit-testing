@@ -26,7 +26,23 @@ $ yarn add @slimio/unit-testing
 ```
 
 ## Usage example
-TBC
+```js
+import test from "@slimio/unit-testing";
+import { strict as assert } from "assert";
+
+test.before = function before() {
+    console.log("before");
+};
+
+test("plan 1 must be ok", (curr) => {
+    curr.plan(1);
+    curr.pass();
+});
+
+test("true must be false", () => {
+    assert.equal(true, false, "expect true to be strict equal to false");
+});
+```
 
 ## API
 TBC

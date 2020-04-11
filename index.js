@@ -1,15 +1,14 @@
-"use strict";
-
 // Require Node.js Dependencies
-const { performance } = require("perf_hooks");
+import { performance } from "perf_hooks";
 
 // Require Third-party Dependencies
-const is = require("@slimio/is");
-const prettyStack = require("@slimio/pretty-stack");
-const { gray, white, green, red, yellow, bgGreen, bgRed } = require("kleur");
+import is from "@slimio/is";
+import prettyStack from "@slimio/pretty-stack";
+import kleur from "kleur";
+import ms from "ms";
 
 // Require Internal Dependencies
-const Helper = require("./src/helper");
+import Helper from "./src/helper.js";
 
 // Vars
 const store = [];
@@ -36,14 +35,14 @@ async function executeHandler(title, handler) {
             throw new Error(`expected '${help.plan}' assertions but got '${help.count}'`);
         }
 
-        const executionTimeMs = (performance.now() - handlerStart).toFixed(2);
-        console.log(`${green("✓")} ${gray(title)} ${white().bold(`(${executionTimeMs}ms)`)}`);
+        const executionTimeMs = ms(Number((performance.now() - handlerStart).toFixed(2)));
+        console.log(`${kleur.green("✓")} ${kleur.gray(title)} ${kleur.white().bold(`(${executionTimeMs})`)}`);
 
         return null;
     }
     catch (error) {
-        const executionTimeMs = (performance.now() - handlerStart).toFixed(2);
-        console.log(`${red("✖")} ${red(title)} ${white().bold(`(${executionTimeMs}ms)`)}`);
+        const executionTimeMs = ms(Number((performance.now() - handlerStart).toFixed(2)));
+        console.log(`${kleur.red("✖")} ${kleur.red(title)} ${kleur.white().bold(`(${executionTimeMs})`)}`);
 
         return error;
     }
@@ -55,6 +54,9 @@ setImmediate(async() => {
     let passed = 0;
     const start = performance.now();
     const errors = [];
+    const toAsync = store.filter((row) => row.async);
+    const maxThreadCount = Unit.maxThreadCount || (toAsync.length < 3 ? toAsync.length : 3);
+    console.log(maxThreadCount);
 
     // Execute before is present
     if (is.func(Unit.before)) {
@@ -69,7 +71,11 @@ setImmediate(async() => {
     }
 
     // Execute registered tests
-    for (const { title, handler } of store) {
+    for (const { title, handler, async } of store) {
+        if (async) {
+            continue;
+        }
+
         const error = await executeHandler(title, handler);
         if (error === null) {
             passed++;
@@ -91,27 +97,24 @@ setImmediate(async() => {
     }
 
     // Print informations about tests execution
-    const executionTimeMs = (performance.now() - start).toFixed(2);
+    const executionTimeMs = ms(Number((performance.now() - start).toFixed(2)));
     const hasError = errors.length > 0;
-    const bgColor = hasError ? bgRed : bgGreen;
-    console.log(`\n${bgColor(white().bold(hasError ? " FAILED " : " SUCCESS "))}\n`);
-    console.log(white().bold(`Total:     ${yellow().bold(store.length)}`));
+    const bgColor = hasError ? kleur.bgRed : kleur.bgGreen;
+    console.log(`\n${bgColor(kleur.white().bold(hasError ? " FAILED " : " SUCCESS "))}\n`);
+    console.log(kleur.white().bold(`Total:     ${kleur.yellow().bold(store.length)}`));
     if (hasError) {
-        console.log(white().bold(`Failed:    ${yellow().bold(errors.length)}`));
+        console.log(kleur.white().bold(`Failed:    ${kleur.yellow().bold(errors.length)}`));
     }
-    console.log(white().bold(`Passed:    ${yellow().bold(passed)}`));
-    console.log(white().bold(`Duration:  ${yellow().bold(executionTimeMs)}ms`));
+    console.log(kleur.white().bold(`Passed:    ${kleur.yellow().bold(passed)}`));
+    console.log(kleur.white().bold(`Duration:  ${kleur.yellow().bold(executionTimeMs)}`));
 
     // Print errors (if there is)
     if (hasError) {
-        for (const { title, error } of errors) {
-            console.log(gray().bold("\n ----------------------------------\n"));
-            console.log(` ${red("✖")} ${red(title)}`);
-            try {
+        for (const { title, error = null } of errors) {
+            console.log(kleur.gray().bold("\n ----------------------------------\n"));
+            console.log(` ${kleur.red("✖")} ${kleur.red(title)}`);
+            if (error !== null) {
                 prettyStack(error);
-            }
-            catch (error) {
-                console.log(error);
             }
         }
     }
@@ -121,13 +124,14 @@ setImmediate(async() => {
  * @function Unit
  * @param {!string} title
  * @param {*} handler
+ * @param {*} options
  * @returns {void}
  */
-function Unit(title, handler) {
+export default function Unit(title, handler, options = Object.create(null)) {
     if (typeof title !== "string") {
         throw new TypeError("title must be a string");
     }
-    store.push({ title, handler });
-}
+    const { timeout = Infinity, async = false } = options;
 
-module.exports = Unit;
+    store.push({ title, handler, timeout, async });
+}
