@@ -1,5 +1,6 @@
 // Require Node.js Dependencies
 import { performance } from "perf_hooks";
+import { once } from "events";
 
 // Require Third-party Dependencies
 import is from "@slimio/is";
@@ -10,42 +11,58 @@ import ms from "ms";
 // Require Internal Dependencies
 import Helper from "./src/helper.js";
 
-// Vars
+// CONSTANTS
+const kDefaultTimeOut = 5000;
 const store = [];
+
+/**
+ * @function timeOutError
+ * @param {!number} timeout
+ * @returns {Error}
+ */
+function timeOutError(timeout) {
+    return new Error(`[TIMEOUT] Maximum allowed time of ${timeout}ms reached!`);
+}
 
 /**
  * @async
  * @function executeHandler
  * @param {!string} title
  * @param {() => any} handler
+ * @param {any} [timeout]
  * @returns {Error | null}
  */
-async function executeHandler(title, handler) {
+async function executeHandler(title, handler, timeout = kDefaultTimeOut) {
     const handlerStart = performance.now();
     const help = new Helper();
+    const timer = setTimeout(() => help.fail(timeOutError(timeout)), timeout);
 
-    try {
-        if (is.asyncFunction(handler)) {
-            await handler(help);
-        }
-        else {
+    if (is.asyncFunction(handler)) {
+        handler(help).then(() => help.succeed()).catch((err) => help.fail(err));
+    }
+    else {
+        try {
             handler(help);
+            setImmediate(() => help.succeed());
         }
-        if (help.hasExpectedPlanCount === false) {
-            throw new Error(`expected '${help.plan}' assertions but got '${help.count}'`);
+        catch (error) {
+            setImmediate(() => help.fail(error));
         }
-
-        const executionTimeMs = ms(Number((performance.now() - handlerStart).toFixed(2)));
-        console.log(`${kleur.green("✓")} ${kleur.gray(title)} ${kleur.white().bold(`(${executionTimeMs})`)}`);
-
-        return null;
     }
-    catch (error) {
-        const executionTimeMs = ms(Number((performance.now() - handlerStart).toFixed(2)));
-        console.log(`${kleur.red("✖")} ${kleur.red(title)} ${kleur.white().bold(`(${executionTimeMs})`)}`);
 
-        return error;
+    let [error] = await once(help, "terminated");
+    clearTimeout(timer);
+
+    if (error === null && help.hasExpectedPlanCount === false) {
+        error = new Error(`expected '${help.plan}' assertions but got '${help.count}'`);
     }
+
+    const executionTimeMs = ms(Number((performance.now() - handlerStart).toFixed(2)));
+    const icon = error === null ? kleur.green("✓") : kleur.red("✖");
+    const titleColor = error === null ? kleur.gray : kleur.red;
+    console.log(`${icon} ${titleColor(title)} ${kleur.white().bold(`(${executionTimeMs})`)}`);
+
+    return error;
 }
 
 // Execute at the next loop iteration
@@ -54,9 +71,9 @@ setImmediate(async() => {
     let passed = 0;
     const start = performance.now();
     const errors = [];
-    const toAsync = store.filter((row) => row.async);
-    const maxThreadCount = Unit.maxThreadCount || (toAsync.length < 3 ? toAsync.length : 3);
-    console.log(maxThreadCount);
+    // const toAsync = store.filter((row) => row.async);
+    // const maxThreadCount = Unit.maxThreadCount || (toAsync.length < 3 ? toAsync.length : 3);
+    // console.log(maxThreadCount);
 
     // Execute before is present
     if (is.func(Unit.before)) {
@@ -71,12 +88,12 @@ setImmediate(async() => {
     }
 
     // Execute registered tests
-    for (const { title, handler, async } of store) {
+    for (const { title, handler, async, timeout } of store) {
         if (async) {
             continue;
         }
 
-        const error = await executeHandler(title, handler);
+        const error = await executeHandler(title, handler, timeout);
         if (error === null) {
             passed++;
         }
@@ -131,7 +148,7 @@ export default function Unit(title, handler, options = Object.create(null)) {
     if (typeof title !== "string") {
         throw new TypeError("title must be a string");
     }
-    const { timeout = Infinity, async = false } = options;
+    const { timeout = Unit.timeout || kDefaultTimeOut, async = false } = options;
 
     store.push({ title, handler, timeout, async });
 }

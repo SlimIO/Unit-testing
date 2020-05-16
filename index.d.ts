@@ -10,6 +10,7 @@ declare namespace Unit {
     export const after: handler;
     export const before: handler;
     export const maxThreadCount: number;
+    export const timeout: number;
 
     interface Options {
         async?: boolean;

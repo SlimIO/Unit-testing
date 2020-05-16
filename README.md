@@ -47,10 +47,6 @@ test("true must be false", () => {
 ## API
 TBC
 
-## Todo
-- beforeAll / afterAll
-- add plan/success/fail
-
 ## Dependencies
 
 |Name|Refactoring|Security Risk|Usage|
